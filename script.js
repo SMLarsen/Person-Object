@@ -33,21 +33,12 @@ Person.prototype = {
       degree: degree
     };
   },
+
   addInterest: function (interest) {
     this.interests.push(interest);
   },
+
   logPerson: function () {
-    // right padding string with spaces to a total of n chars
-    function padding_right(string, n) {
-      if (string.length >= n) {
-        return string;
-      }
-      var max = (n - string.length);
-      for (var i = 0; i < max; i++) {
-        string += " ";
-      }
-      return string;
-    }
     console.log("%cAbout " + steve.name + "\n", "color: #28237C; font-style: bold; font-size: 30px; background-color: #ACA9E0; padding: 2px");
     var whoIs = Object.keys(this);
     var bar = "----------------------------------------------------------------"
@@ -60,17 +51,49 @@ Person.prototype = {
         } else {
           var child = Object.keys(this[whoIs[i]]);
           for (var j = 0; j < child.length; j++) {
-            message += padding_right("   " + child[j] + ":", 20) + this[whoIs[i]][child[j]] + "\n";
+            message += padRight("   " + child[j].replace(/([A-Z])/g, ' $1') + ":", 20) + this[whoIs[i]][child[j]] + "\n";
           }
         }
       } else {
-        message += (padding_right(whoIs[i]+":", 20) + this[whoIs[i]] + "\n");
+        message += (padRight(whoIs[i].replace(/([A-Z])/g, ' $1') + ":", 20) + this[whoIs[i]] + "\n");
       }
     }
-    console.log(message);
+    return message;
+  },
+
+  dispPerson: function () {
+    var message = "";
+    message += "<h3>About " + steve.name + "</h3>";
+    var whoIs = Object.keys(this);
+    for (var i = 0; i < whoIs.length; i++) {
+      if (typeof this[whoIs[i]] === "object") {
+        message += "<h4>" + whoIs[i] + "</h4>";
+        if (Array.isArray(this[whoIs[i]]) === true) {
+          message += "<p>   " + this[whoIs[i]].toString().replace(/,/g, ', ') + "</p>"
+        } else {
+          var child = Object.keys(this[whoIs[i]]);
+          for (var j = 0; j < child.length; j++) {
+            message += "<p>" + child[j].replace(/([A-Z])/g, ' $1') + ": " + this[whoIs[i]][child[j]] + "</p>";
+          }
+        }
+      } else {
+        message += "<p>" + whoIs[i].replace(/([A-Z])/g, ' $1') + ": " + this[whoIs[i]] + "</p>";
+      }
+    }
+    return message;
   }
 };
 
+function padRight(string, n) {    // right padding string with spaces to a total of n chars
+  if (string.length >= n) {
+    return string;
+  }
+  var max = (n - string.length);
+  for (var i = 0; i < max; i++) {
+    string += " ";
+  }
+  return string;
+};
 
 var steve = new Person("Steve Larsen", 1954, "Sheboygan", "WI", "Ellen Hartnett", "Linden Hills");
 steve.addKid("Blakey", 1986, "female", "Berkeley, CA");
@@ -86,4 +109,7 @@ steve.addInterest("Cooking");
 steve.addInterest("Sailing");
 steve.addInterest("Guitar");
 
-steve.logPerson();
+var msg = steve.logPerson();
+console.log(msg);
+
+document.getElementById("person").innerHTML = steve.dispPerson();
